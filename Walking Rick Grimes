@@ -1,0 +1,77 @@
+import pygame
+import sys
+
+# Initialize Pygame
+pygame.init()
+
+# Constants
+WIDTH, HEIGHT = 800, 600
+GROUND_HEIGHT = 50
+PLAYER_SIZE = 40
+PLAYER_SPEED = 5
+JUMP_HEIGHT = 10
+GRAVITY = 0.5
+
+# Colors
+WHITE = (255, 255, 255)
+RED = (255, 0, 0)
+
+# Create the game window
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Rick Grimes Adventure")
+
+# Load player image
+player_image = pygame.image.load("rick_grimes.png")
+player_image = pygame.transform.scale(player_image, (PLAYER_SIZE, PLAYER_SIZE))
+
+# Create player object
+player = pygame.Rect(50, HEIGHT - GROUND_HEIGHT - PLAYER_SIZE, PLAYER_SIZE, PLAYER_SIZE)
+
+# Variables
+player_x_velocity = 0
+player_y_velocity = 0
+on_ground = True
+
+# Game loop
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_LEFT]:
+        player_x_velocity = -PLAYER_SPEED
+    elif keys[pygame.K_RIGHT]:
+        player_x_velocity = PLAYER_SPEED
+    else:
+        player_x_velocity = 0
+
+    if keys[pygame.K_SPACE] and on_ground:
+        player_y_velocity = -JUMP_HEIGHT
+
+    # Apply gravity
+    player_y_velocity += GRAVITY
+
+    # Update player's position
+    player.x += player_x_velocity
+    player.y += player_y_velocity
+
+    # Check for collisions with the ground
+    if player.y >= HEIGHT - GROUND_HEIGHT - PLAYER_SIZE:
+        player.y = HEIGHT - GROUND_HEIGHT - PLAYER_SIZE
+        player_y_velocity = 0
+        on_ground = True
+    else:
+        on_ground = False
+
+    # Drawing
+    screen.fill(WHITE)
+    pygame.draw.rect(screen, RED, (0, HEIGHT - GROUND_HEIGHT, WIDTH, GROUND_HEIGHT))
+    screen.blit(player_image, player)
+
+    pygame.display.update()
+
+# Quit the game
+pygame.quit()
+sys.exit()
